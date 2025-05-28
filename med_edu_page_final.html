@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>药物宣教系统</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .drug-list label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+    .edu-box {
+      border: 1px solid #ccc;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      display: none;
+      background-color: #f9f9f9;
+      font-size: 0.95rem;
+    }
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .button-group button {
+      padding: 10px 14px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+    }
+    .save-hint {
+      display: none;
+      margin-top: 10px;
+      font-weight: bold;
+      color: blue;
+      text-align: center;
+    }
+    #captureImage {
+      display: none;
+      margin: 20px auto;
+      max-width: 100%;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>药物宣教系统</h1>
+
+  <div class="drug-list">
+    <h3>利尿剂</h3>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'spironolactone')"> 螺内酯片</label>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'furosemide')"> 呋塞米片</label>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'torasemide_capsule')"> 托拉塞米胶囊</label>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'torasemide_tablet')"> 托拉塞米片</label>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'tolvaptan')"> 托伐普坦片</label>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'finerenone')"> 非奈利酮片</label>
+    <h3>抗凝药</h3>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'rivaroxaban')"> 利伐沙班片</label>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'edoxaban')"> 甲苯磺酸艾多沙班片</label>
+    <label><input type="checkbox" onchange="toggleEdu(this, 'warfarin')"> 华法林钠片</label>
+  </div>
+
+  <div id="eduContent">
+    <div id="spironolactone" class="edu-box">
+      <strong>螺内酯片：</strong>
+      <p>监测血钾，避免高钾食物；如有乏力、心律不齐需就医。</p>
+    </div>
+    <div id="furosemide" class="edu-box">
+      <strong>呋塞米片：</strong>
+      <p>上午服用，预防夜间尿频；注意电解质丢失。</p>
+    </div>
+    <div id="torasemide_capsule" class="edu-box">
+      <strong>托拉塞米胶囊：</strong>
+      <p>作用时间长；注意监测排尿量、电解质变化。</p>
+    </div>
+    <div id="torasemide_tablet" class="edu-box">
+      <strong>托拉塞米片：</strong>
+      <p>定时服药；不可自行加减量；注意血钾变化。</p>
+    </div>
+    <div id="tolvaptan" class="edu-box">
+      <strong>托伐普坦片：</strong>
+      <p>多饮水防止脱水；定期监测血钠和肝功能。</p>
+    </div>
+    <div id="finerenone" class="edu-box">
+      <strong>非奈利酮片：</strong>
+      <p>饭后服用；监测肾功能和血钾水平；勿联合保钾药。</p>
+    </div>
+    <div id="rivaroxaban" class="edu-box">
+      <strong>利伐沙班片：</strong>
+      <p>定时服药；避免跌倒与出血；勿自行停药。</p>
+    </div>
+    <div id="edoxaban" class="edu-box">
+      <strong>甲苯磺酸艾多沙班片：</strong>
+      <p>避免NSAIDs同服；出血症状需就医；定期查肾功能。</p>
+    </div>
+    <div id="warfarin" class="edu-box">
+      <strong>华法林钠片：</strong>
+      <p>定期查INR；饮食注意维生素K摄入；用药需报告医生。</p>
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button onclick="window.print()">一键打印</button>
+    <button onclick="speakEducation()">语音播报</button>
+    <button onclick="generateImage()">一键截图</button>
+  </div>
+  <div id="saveHint" class="save-hint">📌 请长按下方图片保存</div>
+  <img id="captureImage" alt="宣教截图内容" />
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    function toggleEdu(checkbox, id) {
+      const box = document.getElementById(id);
+      box.style.display = checkbox.checked ? 'block' : 'none';
+    }
+
+    function speakEducation() {
+      const boxes = document.querySelectorAll('.edu-box');
+      let text = '';
+      boxes.forEach(box => {
+        if (box.style.display === 'block') {
+          text += box.innerText + '\n';
+        }
+      });
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      speechSynthesis.speak(utterance);
+    }
+
+    function generateImage() {
+      const target = document.getElementById('eduContent');
+      html2canvas(target).then(canvas => {
+        const image = document.getElementById('captureImage');
+        image.src = canvas.toDataURL("image/png");
+        image.style.display = 'block';
+        document.getElementById('saveHint').style.display = 'block';
+        image.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+  </script>
+</body>
+</html>
